@@ -93,12 +93,14 @@ class PublicPolicyTests(unittest.TestCase):
         config={'reviewedMonth':dt.datetime.now(dt.timezone.utc).strftime('%Y-%m'),'githubSpendingLimitUSD':0,'standardPublicRunnerReviewed':True,'artifactBudgetBytes':450_000_000,'retentionDays':1,'maxRetainedBundles':2}
         repo={'full_name':REPO,'private':False};env={'GITHUB_REPOSITORY':REPO,'GITHUB_REF':'refs/heads/main','GITHUB_EVENT_NAME':'workflow_dispatch'}
         self.assertTrue(check(config,repo,env)['approved'])
+        self.assertTrue(check(config,repo,{**env,'GITHUB_EVENT_NAME':'schedule'})['approved'])
         for change in [{'artifactBudgetBytes':1},{'githubSpendingLimitUSD':1},{'retentionDays':30},{'reviewedMonth':'1900-01'}]:
             with self.assertRaises(ValueError):check({**config,**change},repo,env)
         with self.assertRaises(ValueError):check(config,{**repo,'private':True},env)
-    def test_public_workflow_has_no_private_access_or_automatic_triggers(self):
+    def test_public_scheduled_workflow_has_no_private_access_or_paid_services(self):
         root=Path(__file__).resolve().parents[1];text=(root/'.github/workflows/models.yml').read_text();w=yaml.load(text,Loader=yaml.BaseLoader)
-        self.assertEqual(set(w['on']),{'workflow_dispatch'});self.assertEqual(w['jobs']['process']['runs-on'],'ubuntu-latest')
+        self.assertEqual(set(w['on']),{'workflow_dispatch','schedule'});self.assertEqual(w['jobs']['process']['runs-on'],'ubuntu-latest')
+        self.assertEqual(len(w['on']['schedule']),2)
         self.assertNotIn('secrets.',text);self.assertNotIn('CLOUDFLARE',text);self.assertNotIn('pull_request',text)
         for step in w['jobs']['process']['steps']:
             if 'uses' in step:self.assertRegex(step['uses'],r'@[a-f0-9]{40}\Z')
