@@ -2,7 +2,11 @@ name: Process public forecast data (manual or scheduled)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '13 5,11,17,23 * * *'
+    # Four main model cycles: after expected full ECMWF/GEFS publication, with buffer.
+    - cron: '13 1,8,13,20 * * *'
+    # One lightweight retry per cycle if upstream sources finish late. Data fetch is
+    # skipped when the cheap HEAD probe finds no newer complete public run.
+    - cron: '13 2,9,14,21 * * *'
 permissions:
   contents: read
 concurrency:
