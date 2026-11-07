@@ -13,7 +13,7 @@ def discover(catalog=None):
   except (urllib.error.URLError,ValueError):return {'hasCandidate':True,'reason':'bootstrap: no verified TEST catalog'}
  now=dt.datetime.now(dt.timezone.utc).replace(minute=0,second=0,microsecond=0);new=[]
  for model in ['ecmwf','gefs','icon']:
-  interval=3 if model=='icon' else 6;n=now-dt.timedelta(hours=now.hour%interval);current=catalog.get('models',{}).get(model,{}).get('runId','')
+  interval=6 # Only main 00Z/06Z/12Z/18Z cycles for all models;n=now-dt.timedelta(hours=now.hour%interval);current=catalog.get('models',{}).get(model,{}).get('runId','')
   for i in range(8):
    d=n-dt.timedelta(hours=i*interval);run=d.strftime('%Y%m%d%H')
    if run<=current:break
