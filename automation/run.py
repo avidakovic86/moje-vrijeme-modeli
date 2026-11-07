@@ -34,7 +34,7 @@ def execute(site,work,models,forced=None,now=None,workers=3):
  now=now or dt.datetime.now(dt.timezone.utc);site=Path(site);work=Path(work);work.mkdir(parents=True,exist_ok=True);http=HTTP();report=dict(startedAt=now.isoformat(),models={},changed=False,complete=False)
  for model in models:
   started=time.monotonic();before=http.bytes;source=Source(model,http,work/'geometry');current=load_current(site,model);events=[];updated=False
-  trials=[forced[model]] if forced and model in forced else candidates(now,3 if model=='icon' else 6)
+  trials=[forced[model]] if forced and model in forced else candidates(now,6)
   for run in trials:
    if current and run<=current['runId']:break
    try:
