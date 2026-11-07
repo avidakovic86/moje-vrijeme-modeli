@@ -1,0 +1,12 @@
+.build*/
+.venv/
+__pycache__/
+*.pyc
+.env*
+*.grib*
+*.grb*
+*.bin
+*.nc
+*.zip
+*.tar*
+*.gz

@@ -1,0 +1,8 @@
+{
+  "reviewedMonth": "YYYY-MM",
+  "githubSpendingLimitUSD": 0,
+  "standardPublicRunnerReviewed": false,
+  "artifactBudgetBytes": null,
+  "retentionDays": 1,
+  "maxRetainedBundles": 2
+}

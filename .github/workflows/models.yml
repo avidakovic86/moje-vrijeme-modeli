@@ -1,0 +1,59 @@
+name: Process public forecast data (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: moje-vrijeme-public-model-ingest
+  cancel-in-progress: false
+jobs:
+  process:
+    if: github.repository == 'avidakovic86/moje-vrijeme-modeli' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && vars.MODELS_INGEST_APPROVED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: write # Only own data-artifact retention; no repository writes.
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Confirm public standard-runner and reviewed storage budget
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_QUOTA_REVIEW_JSON: ${{ vars.PUBLIC_QUOTA_REVIEW_JSON }}
+        run: python automation/public_quota.py
+      - name: Probe new runs using artifact metadata and official HEAD requests
+        id: probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python automation/public_probe.py
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        if: steps.probe.outputs.has_candidate == 'true'
+        with:
+          python-version: '3.12'
+      - name: Install GRIB processing dependencies without persistent Actions cache
+        if: steps.probe.outputs.has_candidate == 'true'
+        run: pip install --no-cache-dir -r automation/requirements.txt -r automation/requirements-test.txt
+      - name: Test data integrity and transfer security
+        if: steps.probe.outputs.has_candidate == 'true'
+        run: python -m unittest discover -s tests -v
+      - name: Process all complete model fields and verify data-only bundle
+        id: data
+        if: steps.probe.outputs.has_candidate == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_QUOTA_REVIEW_JSON: ${{ vars.PUBLIC_QUOTA_REVIEW_JSON }}
+        run: python automation/public_run.py
+      - name: Retain only the explicitly verified weather file
+        if: steps.data.outputs.changed == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.data.outputs.artifact_name }}
+          path: .build/output/forecast-bundle.tar.gz
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
