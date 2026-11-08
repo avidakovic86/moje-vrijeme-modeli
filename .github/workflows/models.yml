@@ -31,6 +31,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PUBLIC_QUOTA_REVIEW_JSON: ${{ vars.PUBLIC_QUOTA_REVIEW_JSON }}
         run: python automation/public_quota.py
+      - name: Test cycle-discovery logic before probing external sources
+        run: python -m unittest discover -s tests -p test_discover.py -v
       - name: Probe new runs using artifact metadata and official HEAD requests
         id: probe
         env:
