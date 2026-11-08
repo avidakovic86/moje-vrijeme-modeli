@@ -1,0 +1,25 @@
+name: Validate weather run discovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'automation/discover.py'
+      - 'tests/test_discover.py'
+      - '.github/workflows/discovery-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    if: github.repository == 'avidakovic86/moje-vrijeme-modeli' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Test candidate discovery without network or paid services
+        run: python -m unittest discover -s tests -p test_discover.py -v
