@@ -36,7 +36,7 @@ class GitHub:
         run=self.request(f'/repos/{REPO}/actions/runs/{run_id}')
         if (run.get('repository',{}).get('id')!=REPO_ID or run.get('head_repository',{}).get('id')!=REPO_ID
             or run.get('head_branch')!='main' or run.get('path','').split('@')[0]!=WORKFLOW
-            or run.get('event') not in ('workflow_dispatch','schedule') or run.get('status')!='completed'
+            or run.get('event') not in ('workflow_dispatch','schedule','push') or run.get('status')!='completed'
             or run.get('conclusion')!='success' or not re.fullmatch('[a-f0-9]{40}',run.get('head_sha',''))):
             raise ValueError('Artifact must come from a successful trusted main-branch producer run, never a PR/fork')
         return run
