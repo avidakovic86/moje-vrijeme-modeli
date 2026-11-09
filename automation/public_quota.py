@@ -6,8 +6,8 @@ def check(config, repo, env):
     month=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m')
     if repo.get('private') is not False or repo.get('full_name')!='avidakovic86/moje-vrijeme-modeli':
         raise ValueError('Free public standard-runner policy requires the public model repository')
-    if env.get('GITHUB_REPOSITORY')!=repo['full_name'] or env.get('GITHUB_REF')!='refs/heads/main' or env.get('GITHUB_EVENT_NAME') not in ('workflow_dispatch','schedule'):
-        raise ValueError('Only approved main-branch schedule or owner-triggered runs are enabled')
+    if env.get('GITHUB_REPOSITORY')!=repo['full_name'] or env.get('GITHUB_REF')!='refs/heads/main' or env.get('GITHUB_EVENT_NAME') not in ('workflow_dispatch','schedule','push'):
+        raise ValueError('Only approved main-branch scheduled or explicit owner-triggered runs are enabled')
     if config.get('reviewedMonth')!=month or config.get('githubSpendingLimitUSD')!=0 or config.get('standardPublicRunnerReviewed') is not True:
         raise ValueError('Current-month free quota review and zero extra spending are required')
     budget=config.get('artifactBudgetBytes')
