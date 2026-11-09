@@ -1,1 +1,3 @@
 Explicit owner-approved catch-up weather-model probe for 2026-11-09 after stale ECMWF/GFS maps. Safe: verified public official data only; all no-spend policy checks remain active. No automatic publishing if any model input incomplete.
+
+2026-11-09: Restart ingestion after accepting strictly verified main-branch push artifacts; use approved zero-spend and model-completeness guards.
