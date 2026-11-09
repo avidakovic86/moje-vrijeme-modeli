@@ -6,9 +6,9 @@ on:
     paths:
       - 'automation/trigger-ingest.txt'
   schedule:
-    # Hourly cheap HEAD probe. Provider publication can be late and GitHub cron
-    # can be delayed; only ready, newer 00Z/06Z/12Z/18Z runs trigger GRIB work.
-    - cron: '17 * * * *'
+    # Two staggered cheap HEAD checks per hour reduce missed GitHub cron
+    # slots. GRIB work only starts for verified newer 00Z/06Z/12Z/18Z runs.
+    - cron: '17,47 * * * *'
 permissions:
   contents: read
 concurrency:
