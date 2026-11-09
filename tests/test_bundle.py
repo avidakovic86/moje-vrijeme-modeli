@@ -100,7 +100,7 @@ class PublicPolicyTests(unittest.TestCase):
     def test_public_scheduled_workflow_has_no_private_access_or_paid_services(self):
         root=Path(__file__).resolve().parents[1];text=(root/'.github/workflows/models.yml').read_text();w=yaml.load(text,Loader=yaml.BaseLoader)
         self.assertEqual(set(w['on']),{'workflow_dispatch','schedule'});self.assertEqual(w['jobs']['process']['runs-on'],'ubuntu-latest')
-        self.assertEqual(len(w['on']['schedule']),2)
+        self.assertEqual(len(w['on']['schedule']),1)
         self.assertNotIn('secrets.',text);self.assertNotIn('CLOUDFLARE',text);self.assertNotIn('pull_request',text)
         for step in w['jobs']['process']['steps']:
             if 'uses' in step:self.assertRegex(step['uses'],r'@[a-f0-9]{40}\Z')
