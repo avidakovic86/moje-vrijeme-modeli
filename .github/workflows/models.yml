@@ -2,11 +2,9 @@ name: Process public forecast data (manual or scheduled)
 on:
   workflow_dispatch:
   schedule:
-    # Four main model cycles: after expected full ECMWF/GEFS publication, with buffer.
-    - cron: '13 1,8,13,20 * * *'
-    # One lightweight retry per cycle if upstream sources finish late. Data fetch is
-    # skipped when the cheap HEAD probe finds no newer complete public run.
-    - cron: '13 2,9,14,21 * * *'
+    # Hourly cheap HEAD probe. Provider publication can be late and GitHub cron
+    # can be delayed; only ready, newer 00Z/06Z/12Z/18Z runs trigger GRIB work.
+    - cron: '17 * * * *'
 permissions:
   contents: read
 concurrency:
