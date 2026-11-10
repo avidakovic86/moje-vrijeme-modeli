@@ -102,7 +102,9 @@ class PublicPolicyTests(unittest.TestCase):
         self.assertEqual(set(w['on']),{'workflow_dispatch','push','schedule'});self.assertEqual(w['jobs']['process']['runs-on'],'ubuntu-latest')
         self.assertEqual(len(w['on']['schedule']),1)
         self.assertEqual(w['on']['push']['paths'],['automation/trigger-ingest.txt'])
-        self.assertNotIn('secrets.',text);self.assertNotIn('CLOUDFLARE',text);self.assertNotIn('pull_request',text)
+        self.assertIn('secrets.MAIN_WORKFLOW_DISPATCH_TOKEN',text)
+        self.assertEqual(text.count('secrets.'),1,'Only the narrow private workflow dispatch token may be referenced')
+        self.assertNotIn('CLOUDFLARE',text);self.assertNotIn('pull_request',text)
         for step in w['jobs']['process']['steps']:
             if 'uses' in step:self.assertRegex(step['uses'],r'@[a-f0-9]{40}\Z')
         paths=[p for p in root.rglob('*') if p.is_file() and '.git' not in p.parts and '.build' not in p.parts and '__pycache__' not in p.parts]
