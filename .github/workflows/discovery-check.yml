@@ -6,6 +6,8 @@ on:
     paths:
       - 'automation/discover.py'
       - 'tests/test_discover.py'
+      - 'automation/notify_main.py'
+      - 'tests/test_notify_main.py'
       - '.github/workflows/discovery-check.yml'
   workflow_dispatch:
 
@@ -23,3 +25,5 @@ jobs:
           persist-credentials: false
       - name: Test candidate discovery without network or paid services
         run: python -m unittest discover -s tests -p test_discover.py -v
+      - name: Verify safe completion-trigger protocol without network
+        run: python -m unittest discover -s tests -p test_notify_main.py -v
