@@ -67,3 +67,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
+      - name: Trigger immediate private MAIN deployment after verified bundle upload
+        if: steps.data.outputs.changed == 'true'
+        env:
+          MAIN_WORKFLOW_DISPATCH_TOKEN: ${{ secrets.MAIN_WORKFLOW_DISPATCH_TOKEN }}
+        run: python automation/notify_main.py
